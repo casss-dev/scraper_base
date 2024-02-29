@@ -37,11 +37,15 @@ class WebDriverBuilder:
         show_browser: bool = False,
         in_container: bool = False,
         implicit_wait_time: int = 10,
+        stealth_mode: bool = False,
+        agent: str = "",
     ) -> None:
         self.remote_port = remote_port
         self.show_browser = show_browser
         self.container = in_container
         self.implicit_wait_time = implicit_wait_time
+        self.stealth_mode = stealth_mode
+        self.agent = agent
 
     def build(self, driver_type: DriverType) -> WebDriver:
         """A convenience function to build a driver of the specified type
@@ -80,6 +84,11 @@ class WebDriverBuilder:
         if self.container:
             opts.add_argument("--no-sandbox")
             opts.add_argument("--disable-dev-shm-usage")
+        if self.stealth_mode:
+            opts.add_experimental_option("excludeSwitches", ["enable-automation"])
+            opts.add_experimental_option("useAutomationExtension", False)
+        if self.agent:
+            opts.add_argument(f"user-agent={self.agent}")
         return opts
 
     def _build_chrome(
@@ -127,3 +136,7 @@ class WebDriverBuilder:
     def _config_driver(self, driver: WebDriver):
         if self.implicit_wait_time > 0:
             driver.implicitly_wait(self.implicit_wait_time)
+        if self.stealth_mode:
+            driver.execute_script(
+                "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
+            )
