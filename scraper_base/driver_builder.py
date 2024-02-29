@@ -24,7 +24,7 @@ class WebDriverBuilder:
 
         pass
 
-    class DriverType(Enum):
+    class DriverType(str, Enum):
         Chrome = "chrome"
         Chromium = "chromium"
         Standalone = "standalone"
