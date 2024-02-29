@@ -58,22 +58,22 @@ class WebDriverBuilder:
         """
         match driver_type:
             case WebDriverBuilder.DriverType.Chrome:
-                return self.build_chrome(self.chrome_options)
+                return self._build_chrome(self._chrome_options)
             case WebDriverBuilder.DriverType.Chromium:
-                return self.build_chrome(
-                    self.chrome_options, chrome_type=ChromeType.CHROMIUM
+                return self._build_chrome(
+                    self._chrome_options, chrome_type=ChromeType.CHROMIUM
                 )
             case WebDriverBuilder.DriverType.Standalone:
                 if self.show_browser:
                     standalone_url = "http://localhost:7900/?autoconnect=1&resize=scale&password=secret"
                     os.system(f"open '{standalone_url}'")
-                driver = self.build_remote(url=self.STANDALONE_LOCAL_URL)
+                driver = self._build_remote(url=self.STANDALONE_LOCAL_URL)
                 if not driver:
                     raise WebDriverBuilder.RemoteDriverTimeout
                 return driver
 
     @property
-    def chrome_options(self) -> webdriver.ChromeOptions:
+    def _chrome_options(self) -> webdriver.ChromeOptions:
         opts = webdriver.ChromeOptions()
         if not self.show_browser:
             opts.add_argument("--headless")
@@ -82,7 +82,7 @@ class WebDriverBuilder:
             opts.add_argument("--disable-dev-shm-usage")
         return opts
 
-    def build_chrome(
+    def _build_chrome(
         self, options: webdriver.ChromeOptions, chrome_type: str = ChromeType.GOOGLE
     ) -> WebDriver:
         """Builds an instance of a chrome browser.
@@ -99,7 +99,7 @@ class WebDriverBuilder:
         self._config_driver(driver)
         return driver
 
-    def build_remote(
+    def _build_remote(
         self, url: str, retry_count: int = 3, retry_delay: int = 5
     ) -> WebDriver | None:
         """Builds a web driver for connecting to a remote browser.
@@ -120,7 +120,7 @@ class WebDriverBuilder:
             driver = None
         if not driver:
             time.sleep(retry_count)
-            return self.build_remote(url, retry_count=retry_count - 1)
+            return self._build_remote(url, retry_count=retry_count - 1)
         self._config_driver(driver)
         return driver
 
