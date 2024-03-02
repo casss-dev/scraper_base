@@ -1,3 +1,4 @@
+from typing import Union
 from enum import Enum
 import time
 import os
@@ -37,6 +38,7 @@ class WebDriverBuilder:
         show_browser: bool = False,
         in_container: bool = False,
         implicit_wait_time: int = 10,
+        download_directory: Union[str, bytes, os.PathLike, None] = None,
         stealth_mode: bool = False,
         agent: str = "",
     ) -> None:
@@ -46,6 +48,7 @@ class WebDriverBuilder:
         self.implicit_wait_time = implicit_wait_time
         self.stealth_mode = stealth_mode
         self.agent = agent
+        self.download_directory = download_directory
 
     def build(self, driver_type: DriverType) -> WebDriver:
         """A convenience function to build a driver of the specified type
@@ -84,6 +87,10 @@ class WebDriverBuilder:
         if self.container:
             opts.add_argument("--no-sandbox")
             opts.add_argument("--disable-dev-shm-usage")
+        if self.download_directory:
+            opts.add_experimental_option(
+                "prefs", {"download.default_directory": self.download_directory}
+            )
         if self.stealth_mode:
             opts.add_experimental_option("excludeSwitches", ["enable-automation"])
             opts.add_experimental_option("useAutomationExtension", False)
