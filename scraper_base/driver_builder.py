@@ -86,6 +86,7 @@ class WebDriverBuilder:
         if self.container:
             opts.add_argument("--no-sandbox")
             opts.add_argument("--disable-dev-shm-usage")
+            opts.add_argument("--disable-gpu")
         if self.download_directory:
             opts.add_experimental_option(
                 "prefs", {"download.default_directory": self.download_directory}
