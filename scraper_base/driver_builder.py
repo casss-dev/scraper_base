@@ -1,4 +1,3 @@
-from typing import Union
 from enum import Enum
 import time
 import os
@@ -38,7 +37,7 @@ class WebDriverBuilder:
         show_browser: bool = False,
         in_container: bool = False,
         implicit_wait_time: int = 10,
-        download_directory: Union[str, bytes, os.PathLike, None] = None,
+        download_directory: str | None = None,
         stealth_mode: bool = False,
         agent: str = "",
     ) -> None:
