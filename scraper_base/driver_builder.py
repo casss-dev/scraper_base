@@ -1,3 +1,4 @@
+from typing import Union, TypeVar
 from enum import Enum
 import time
 import os
@@ -7,6 +8,8 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.core.os_manager import ChromeType
+
+PathLike = Union[str, bytes, os.PathLike]
 
 
 class WebDriverBuilder:
@@ -37,7 +40,8 @@ class WebDriverBuilder:
         show_browser: bool = False,
         in_container: bool = False,
         implicit_wait_time: int = 10,
-        download_directory: str | None = None,
+        user_session_directory: PathLike | None = None,
+        download_directory: PathLike | None = None,
         stealth_mode: bool = False,
         agent: str = "",
     ) -> None:
@@ -47,6 +51,7 @@ class WebDriverBuilder:
         self.implicit_wait_time = implicit_wait_time
         self.stealth_mode = stealth_mode
         self.agent = agent
+        self.user_session_directory = user_session_directory
         self.download_directory = download_directory
 
     def build(self, driver_type: DriverType) -> WebDriver:
@@ -87,9 +92,11 @@ class WebDriverBuilder:
             opts.add_argument("--no-sandbox")
             opts.add_argument("--disable-dev-shm-usage")
             opts.add_argument("--disable-gpu")
+        if self.user_session_directory:
+            opts.add_argument("user-data-dir=%s" % self.user_session_directory)
         if self.download_directory:
             opts.add_experimental_option(
-                "prefs", {"download.default_directory": self.download_directory}
+                "prefs", {"download.default_directory": "%s" % self.download_directory}
             )
         if self.stealth_mode:
             opts.add_experimental_option("excludeSwitches", ["enable-automation"])
