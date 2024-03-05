@@ -54,11 +54,15 @@ class WebDriverBuilder:
         self.user_session_directory = user_session_directory
         self.download_directory = download_directory
 
-    def build(self, driver_type: DriverType) -> WebDriver:
+    def build(
+        self, driver_type: DriverType, driver_path: str | None = None
+    ) -> WebDriver:
         """A convenience function to build a driver of the specified type
 
         Args:
             driver_type (DriverType): The type of driver to build
+            driver_type (str | None): The path to the driver (otherwise the path will be
+            attempted to be found / created)
 
         Raises:
             WebDriverBuilder.RemoteDriverTimeout: Occurs when a remote driver reaches its max
@@ -69,10 +73,12 @@ class WebDriverBuilder:
         """
         match driver_type:
             case WebDriverBuilder.DriverType.Chrome:
-                return self._build_chrome(self._chrome_options)
+                return self._build_chrome(self._chrome_options, chrome_path=driver_path)
             case WebDriverBuilder.DriverType.Chromium:
                 return self._build_chrome(
-                    self._chrome_options, chrome_type=ChromeType.CHROMIUM
+                    self._chrome_options,
+                    chrome_type=ChromeType.CHROMIUM,
+                    chrome_path=driver_path,
                 )
             case WebDriverBuilder.DriverType.Standalone:
                 if self.show_browser:
@@ -106,7 +112,10 @@ class WebDriverBuilder:
         return opts
 
     def _build_chrome(
-        self, options: webdriver.ChromeOptions, chrome_type: str = ChromeType.GOOGLE
+        self,
+        options: webdriver.ChromeOptions,
+        chrome_type: str = ChromeType.GOOGLE,
+        chrome_path: str | None = None,
     ) -> WebDriver:
         """Builds an instance of a chrome browser.
 
@@ -116,7 +125,7 @@ class WebDriverBuilder:
         Returns:
             WebDriver: A chrome web driver
         """
-        path = ChromeDriverManager(chrome_type=chrome_type).install()
+        path = chrome_path or ChromeDriverManager(chrome_type=chrome_type).install()
         service = Service(executable_path=path)
         driver = webdriver.Chrome(options=options, service=service)
         self._config_driver(driver)
